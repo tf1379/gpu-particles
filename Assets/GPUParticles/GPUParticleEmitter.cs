@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace GPUParticles
@@ -81,6 +82,14 @@ namespace GPUParticles
         public Vector3 constantVelocity;
         public new Vector3 constantForce = Vector3.up;
         public float linearDrag = 1f;
+        #endregion
+
+        
+        #region Positions
+        public bool useMultiInheritedPosition = false;
+        public ComputeBuffer inheritedPositionsBuffer;
+        private int inheritedPositionsBufferCount = -1;
+        public List<Vector3> inheritedPositionsList = new List<Vector3>();
         #endregion
 
         #region Assets
@@ -179,6 +188,32 @@ namespace GPUParticles
             sizeOverLifeBuffer.SetData(temp);
         }
 
+        public void UpdateInheritedPositionsBuffer()
+        {
+            if (inheritedPositionsBuffer == null || inheritedPositionsBufferCount != inheritedPositionsList.Count)
+            {
+                inheritedPositionsBuffer?.Release();
+                inheritedPositionsBuffer = new ComputeBuffer(inheritedPositionsList.Count, Marshal.SizeOf(typeof(Vector3)));
+                inheritedPositionsBufferCount = inheritedPositionsList.Count;
+            }
+            inheritedPositionsBuffer.SetData<Vector3>(inheritedPositionsList);
+        }
+
+        public void ApplyMultiInheritedPositions(Vector3[] positions)
+        {
+            useMultiInheritedPosition = true;
+            inheritedPositionsList.Clear();
+            inheritedPositionsList.AddRange(positions);
+            UpdateInheritedPositionsBuffer();
+        }
+
+        public void DisableMultiInheritedPositions()
+        {
+            useMultiInheritedPosition = false;
+            inheritedPositionsList.Clear();
+            UpdateInheritedPositionsBuffer();
+        }
+
         public void DispatchInit()
         {
             ReleaseBuffers();
@@ -234,6 +269,18 @@ namespace GPUParticles
                     computeShader.SetVector("seeds", new Vector3(Random.Range(1f, 10000f), Random.Range(1f, 10000f), Random.Range(1f, 10000f)));
                     computeShader.SetVector("initialSpeedRange", new Vector2(minInitialSpeed, maxInitialSpeed));
                     computeShader.SetVector("inheritedPosition", transform.position);
+                    
+                    if (useMultiInheritedPosition && inheritedPositionsBuffer != null)
+                    {
+                        computeShader.SetInt("useMultiInheritedPosition", 1);
+                        if (inheritedPositionsBuffer == null) 
+                            UpdateInheritedPositionsBuffer();
+                        computeShader.SetBuffer(emitKernel, "inheritedPositions", inheritedPositionsBuffer);
+                    }
+                    else
+                    {
+                        computeShader.SetInt("useMultiInheritedPosition", 0);
+                    }
                     computeShader.SetVector("lifeRange", new Vector2(minLifetime, maxLifetime));
                     computeShader.SetVector("time", new Vector2(Time.deltaTime, Time.time));
 
@@ -373,6 +420,7 @@ namespace GPUParticles
             if (counter != null) counter.Release();
             if (quad != null) quad.Release();
             if (sizeOverLifeBuffer != null) sizeOverLifeBuffer.Release();
+            if (inheritedPositionsBuffer != null) inheritedPositionsBuffer.Release();
         }
 
         #endregion

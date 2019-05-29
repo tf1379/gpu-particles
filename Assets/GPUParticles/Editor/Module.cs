@@ -6,7 +6,7 @@ namespace GPUParticles
 {
     public abstract class Module
     {
-        public static Color headerColor = new Color(0.15f, 0.15f, 0.15f);
+        public static Color headerColor = EditorGUIUtility.isProSkin ? new Color(0.15f, 0.15f, 0.15f) : new Color(0.65f, 0.65f, 0.65f);
 
         public abstract void Draw();
 

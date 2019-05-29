@@ -46,8 +46,8 @@ namespace GPUParticles
         {
             serializedObject.Update();
 
-            EditorGUILayout.LabelField(new GUIContent(logo), Styles.title, GUILayout.Height(EditorGUIUtility.singleLineHeight * 4f));
-            EditorGUILayout.LabelField("Version " + GPUParticleEmitter.VERSION + " (C) Robert Kossessa 2017", Styles.title);
+            //EditorGUILayout.LabelField(new GUIContent(logo), Styles.title, GUILayout.Height(EditorGUIUtility.singleLineHeight * 4f));
+            EditorGUILayout.LabelField("[GPU Particles] Version " + GPUParticleEmitter.VERSION + " (C) Robert Kossessa 2017", Styles.title);
 
             GUI.color = Color.white;
 

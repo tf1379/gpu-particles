@@ -28,13 +28,13 @@ namespace GPUParticles
             EditorGUILayout.PropertyField(computeShader, new GUIContent("Compute Shader"));
             EditorGUILayout.PropertyField(renderMaterial, new GUIContent("Render Material"));
             EditorGUI.BeginChangeCheck();
-            darkSkin = EditorGUILayout.Toggle(new GUIContent("Dark Skin"), darkSkin);
-            if (EditorGUI.EndChangeCheck())
-            {
-                EditorPrefs.SetBool("DarkSkin", darkSkin);
-                if (darkSkin) headerColor = new Color(0.15f, 0.15f, 0.15f);
-                else headerColor = new Color(0.63f, 0.63f, 0.63f);
-            }
+            // darkSkin = EditorGUILayout.Toggle(new GUIContent("Dark Skin"), darkSkin);
+            // if (EditorGUI.EndChangeCheck())
+            // {
+            //     EditorPrefs.SetBool("DarkSkin", darkSkin);
+            //     if (darkSkin) headerColor = new Color(0.15f, 0.15f, 0.15f);
+            //     else headerColor = new Color(0.63f, 0.63f, 0.63f);
+            // }
         }
     }
 }

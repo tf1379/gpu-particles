@@ -47,6 +47,9 @@ RWStructuredBuffer<Particle> particles;
 AppendStructuredBuffer<uint> dead;
 ConsumeStructuredBuffer<uint> alive;
 
+RWStructuredBuffer<float3> inheritedPositions;
+int useMultiInheritedPosition;
+
 float rand(float3 co)
 {
     return frac(sin(dot(co.xyz, float3(12.9898, 78.233, 45.5432))) * 43758.5453);
@@ -126,7 +129,19 @@ void Emit()
     }
     p.velocity += inheritedVelocity;
     p.position -= inheritedVelocity * rand(seeds.xzy / (id + 1)) * extrapolation;
-    p.position += inheritedPosition;
+    
+    if (useMultiInheritedPosition > 0)
+    {
+        uint posW, posH;
+        inheritedPositions.GetDimensions(posW, posH);
+        uint posIndex = (uint)(rand(seeds.yzx / (id + 1)) * posW);
+        p.position += inheritedPositions[posIndex];
+    }
+    else
+    {
+        p.position += inheritedPosition;
+    }
+
     p.life.x = 0.0f;
     p.life.y = lifeRange.x + (lifeRange.y - lifeRange.x) * rand(seeds.zxy / (id + 1));
     if (colorMode <= 1)
